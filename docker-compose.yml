@@ -1,0 +1,10 @@
+version: '2'
+services:
+  latest:
+    image: adaptive-bf:latest
+    ports:
+    - 8888:8888
+    volumes:
+    - .:/home/jovyan/work
+    environment:
+    - JUPYTER_ENABLE_LAB=yes
