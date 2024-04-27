@@ -1,0 +1,49 @@
+# @package _global_
+defaults:
+  - /alg: HGP
+  - _self_
+  - /alg/approximate_selector: fraction
+
+hydra:
+  sweeper:
+    params:
+      bf.m: range(2, 21)
+
+generator: fasthgp.examples.random_example
+
+# Do not use sweep for fractions -- each configuration will require a new run of the vanilla GP as well as the HGP. Since each fraction is just a different approximate prediction without changing the underlying HGP, this version is a lot faster than sweeping.
+fractions: [0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3, 0.5, 0.75]
+
+kernel:
+  _target_: fasthgp.kernels.SE
+  lengthscale: 0.2
+  variance: 0.25
+
+prior:
+  _target_: gpjax.gps.Prior
+  mean_function:
+    _target_: gpjax.mean_functions.Zero
+  kernel: ${..kernel}
+
+likelihood:
+  _target_: gpjax.likelihoods.Gaussian
+  num_datapoints: ${..N}
+  obs_stddev: 
+    _target_: jax.numpy.array
+    object: [0.01]
+
+bf:
+  _target_: ${generator}.build_bf
+  m: 1
+  L: 2.0
+  center: 0
+
+N: 1000
+data_generator: 
+  _partial_: true
+  _target_: ${..generator}.generate_data
+  N: ${..N}
+  kernel: 
+    _target_: gpjax.kernels.RBF
+    lengthscale: ${...kernel.lengthscale}
+    variance: ${...kernel.variance}

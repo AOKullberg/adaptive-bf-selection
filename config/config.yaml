@@ -1,0 +1,10 @@
+defaults:
+  - experiment: random_example
+  - _self_
+  - override hydra/launcher: joblib
+  
+hydra:
+  launcher:
+    n_jobs: 1
+  job:
+    chdir: True
