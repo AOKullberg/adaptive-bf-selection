@@ -1,0 +1,3 @@
+[submodule "fast-hgp"]
+	path = fast-hgp
+	url = git@github.com:AOKullberg/fast-hgp.git
